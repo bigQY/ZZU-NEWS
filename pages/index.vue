@@ -391,28 +391,3 @@ watch(newList, () => {
   right: 0;
 }
 </style>
-
-<style>
-.loading-container {
-  width: 100%;
-  height: 40vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loading-text {
-  font-size: 24px;
-  animation: loadingAnimation 1.5s infinite;
-}
-
-@keyframes loadingAnimation {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-</style>
