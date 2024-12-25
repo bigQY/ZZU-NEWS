@@ -27,12 +27,12 @@
           <p :class="['like-count', { mobile: isMobile }]">点赞量 {{ news.like_count }}</p>
         </div>
         <iframe
-          v-if="index <= loadedIndex"
-          id="news-iframe"
+          v-if="index <= loadedIndex && index < maxLoadedIndex"
+          class="news-iframe"
           :class="{ mobile: isMobile }"
-          :style="{ height: iframeHeight + 'px' }"
           :src="news.url"
           @load="onIframeLoad($event)"
+          :style="{ height: iframeHeight + 'px' }"
         ></iframe>
         <div v-else class="loading-container">
           <div class="loading-text">加载中...</div>
@@ -128,8 +128,19 @@ const submitNewNews = async () => {
 
 const newList = ref([])
 const loadedIndex = ref(0)
+const maxLoadedIndex = ref(3) // 最多同时允许3个iframe加载
 const onIframeLoad = (event) => {
+  const iframe = event.target
+  try {
+    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document
+    iframeDocument.body.style.overflow = 'hidden'
+  } catch (error) {
+    console.error('无法访问iframe的内容:', error)
+  }
   loadedIndex.value++
+  if (loadedIndex.value < newList.value.length) {
+    maxLoadedIndex.value++
+  }
 }
 onMounted(() => {
   // 初始化加载第一个 iframe
