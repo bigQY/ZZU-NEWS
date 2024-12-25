@@ -1,71 +1,104 @@
 <template>
   <div>
-    <div id="head">
-      <h1 id="title">郑州大学大新闻</h1>
-      <p id="info">一个<span style="color: red">自由</span>的新闻媒体</p>
-      <div style="margin-top: 50px">
-        <a id="publish" @click="publishNew">发布新闻</a>
-        <a class="explorer" href="#news">查看新闻</a>
-      </div>
+    <div>
+      <!-- 右上角专注模式开关 -->
+      <button class="switch-focus" @click="switchFocusMode">
+        {{ focusMode ? '退出专注模式' : '进入专注模式' }}
+      </button>
     </div>
-    <div id="submitNewNews" style="width: 100%; text-align: center" v-if="submitOpen">
-      <input id="input" v-model="newNewsInput" type="text" placeholder="请输入新闻的IPFS地址" />
-      <a class="explorer" @click="submitNewNews">提交</a>
-    </div>
-    <div id="news">
-      <!-- 新闻显示 -->
-      <div
-        v-for="(news, index) in newList"
-        :key="news.id"
-        :class="['news-item', { mobile: isMobile }]"
-      >
-        <div class="news-info">
-          <p :class="['publish-time', { mobile: isMobile }]">
-            {{ new Date(news.publish_time).toLocaleString() }} 发布
-          </p>
-          <p :class="['read-count', { mobile: isMobile }]">浏览量 {{ news.read_count }}</p>
-          <p :class="['like-count', { mobile: isMobile }]">点赞量 {{ news.like_count }}</p>
-        </div>
-        <iframe
-          v-if="index <= loadedIndex && index < maxLoadedIndex"
-          scrolling="no"
-          class="news-iframe"
-          :class="{ mobile: isMobile }"
-          :src="news.url"
-          @load="onIframeLoad($event)"
-          :style="{ height: iframeHeight + 'px' }"
-        ></iframe>
-        <div v-else class="loading-container">
-          <div class="loading-text">加载中...</div>
-        </div>
-        <br />
-        <div
-          style="
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            position: relative;
-            box-shadow: rgb(255 255 255 / 100%) 0px -20px 20px 20px;
-          "
-        >
-          <a class="explorer" @click="viewNews(news.url)">查看详情</a>
-          <a class="explorer" @click="likeNews(news.url)">点赞</a>
+    <div v-show="!focusMode">
+      <div id="head">
+        <h1 id="title">郑州大学大新闻</h1>
+        <p id="info">一个<span style="color: red">自由</span>的新闻媒体</p>
+        <div style="margin-top: 50px">
+          <a id="publish" @click="publishNew">发布新闻</a>
+          <a class="explorer" href="#news">查看新闻</a>
         </div>
       </div>
-      <div style="width: 100%; text-align: center" v-if="newList.length === 0">
-        <div class="loading-container">
-          <div class="loading-text">加载中...</div>
+      <div id="submitNewNews" style="width: 100%; text-align: center" v-if="submitOpen">
+        <input id="input" v-model="newNewsInput" type="text" placeholder="请输入新闻的IPFS地址" />
+        <a class="explorer" @click="submitNewNews">提交</a>
+      </div>
+      <div id="news">
+        <!-- 新闻显示 -->
+        <NewsItem
+          v-for="(news, index) in newList"
+          :key="news.id"
+          :news="news"
+          :isLoading="index <= loadedIndex && index < maxLoadedIndex"
+          :isMobile="isMobile"
+          :iframeHeight="iframeHeight"
+          :onIframeLoad="onIframeLoad"
+        />
+        <div style="width: 100%; text-align: center" v-if="newList.length === 0">
+          <div class="loading-container">
+            <div class="loading-text">加载中...</div>
+          </div>
         </div>
       </div>
     </div>
-    <div style="width: 100%; text-align: center">
+    <div v-if="focusMode">
+      <NewsItem
+        :news="newList[focusIndex]"
+        :isMobile="isMobile"
+        :iframeHeight="iframeHeight"
+        :onIframeLoad="onFocusIframeLoad"
+        :onPageChange="onPageChange"
+        iframeScrolling="yes"
+        :isFocus="true"
+      />
+    </div>
+    <div v-if="!focusMode" style="width: 100%; text-align: center">
       <a class="explorer" @click="loadMoreNews(0, 10)">查看更多</a>
     </div>
   </div>
 </template>
 
 <script setup>
+import NewsItem from '@/components/NewsItem.vue'
 import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue'
+
+const focusMode = ref(false)
+const focusIndex = ref(0)
+
+const switchFocusMode = () => {
+  focusMode.value = !focusMode.value
+  nextTick(() => {
+    computeIframeHeight()
+  })
+}
+
+const handleKeydown = (event) => {
+  if (focusMode.value) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      if (focusIndex.value > 0) {
+        focusIndex.value--
+      }
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      if (focusIndex.value < newList.value.length - 1) {
+        focusIndex.value++
+      }
+    }
+  }
+}
+
+const onPageChange = (action) => {
+  if (action === 'pre') {
+    if (focusIndex.value > 0) {
+      focusIndex.value--
+    } else {
+      alert('已经是第一篇了')
+    }
+  } else if (action === 'next') {
+    if (focusIndex.value < newList.value.length - 1) {
+      focusIndex.value++
+    } else {
+      alert('已经是最后一篇了')
+    }
+  } else {
+    console.error('非法action')
+  }
+}
 
 const submitOpen = ref(false)
 
@@ -85,16 +118,6 @@ const publishNew = () => {
       '注意：新闻内容使用IPFS存储，发布后不可更改，不可删除'
   )
   submitOpen.value = true
-}
-
-const getScale = (widthRatio, widthPx) => {
-  // 获取屏幕的宽高
-  const screenWidth = window.innerWidth
-  // 计算缩放比例
-  const width = (widthRatio * screenWidth) / widthPx
-  return {
-    transform: `scale(${width})`
-  }
 }
 
 const newNewsInput = ref('')
@@ -131,13 +154,6 @@ const newList = ref([])
 const loadedIndex = ref(0)
 const maxLoadedIndex = ref(3) // 最多同时允许3个iframe加载
 const onIframeLoad = (event) => {
-  const iframe = event.target
-  try {
-    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document
-    iframeDocument.body.style.overflow = 'hidden'
-  } catch (error) {
-    console.error('无法访问iframe的内容:', error)
-  }
   loadedIndex.value++
   if (loadedIndex.value < newList.value.length) {
     maxLoadedIndex.value++
@@ -184,60 +200,34 @@ onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
   window.addEventListener('resize', computeIframeHeight)
+  window.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', checkMobile)
   window.removeEventListener('resize', computeIframeHeight)
+  window.removeEventListener('keydown', handleKeydown)
 })
-
-const viewNews = async (url) => {
-  const viewedNews = JSON.parse(localStorage.getItem('viewedNews')) || []
-  if (viewedNews.includes(url)) {
-    return
-  }
-
-  const newWindow = window.open(url, '_blank')
-  if (!newWindow) {
-    alert('请允许弹出窗口')
-    return
-  }
-
-  await $fetch('/api/viewNews', {
-    method: 'POST',
-    body: {
-      url
-    }
-  })
-
-  viewedNews.push(url)
-  localStorage.setItem('viewedNews', JSON.stringify(viewedNews))
-}
-
-const likeNews = async (url) => {
-  const likedNews = JSON.parse(localStorage.getItem('likedNews')) || []
-  if (likedNews.includes(url)) {
-    return
-  }
-
-  await $fetch('/api/likeNews', {
-    method: 'POST',
-    body: {
-      url
-    }
-  })
-
-  likedNews.push(url)
-  localStorage.setItem('likedNews', JSON.stringify(likedNews))
-}
 
 const iframeHeight = ref(300)
 
 const computeIframeHeight = () => {
-  const containerHeight = (60 * window.innerHeight) / 100 // 容器高度为60vh
-  const newsInfoDom = document.querySelector('.news-info')
+  const getNonZeroHeightElement = (selector) => {
+    const elements = document.querySelectorAll(selector)
+    for (const element of elements) {
+      if (element.offsetHeight > 0) {
+        return element
+      }
+    }
+    return null
+  }
+  let containerHeight = (60 * window.innerHeight) / 100 // 容器高度为60vh
+  if (focusMode.value) {
+    containerHeight = (95 * window.innerHeight) / 100
+  }
+  const newsInfoDom = getNonZeroHeightElement('.news-info')
   const newsInfoHeight = newsInfoDom ? newsInfoDom.offsetHeight : 0
-  const buttonContainerDom = document.querySelector('.news-item > div:last-child')
+  const buttonContainerDom = getNonZeroHeightElement('.news-item > div:last-child')
   const buttonContainerHeight = buttonContainerDom ? buttonContainerDom.offsetHeight : 0
   iframeHeight.value =
     containerHeight - newsInfoHeight - buttonContainerHeight - 0.05 * window.innerHeight
@@ -251,124 +241,12 @@ watch(newList, () => {
 </script>
 
 <style scoped>
-#news-iframe {
-  width: 100%;
-  height: 80%;
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-#news-iframe.mobile {
-  height: 70%;
-}
-
-.loading-container {
-  width: 100%;
-  height: 40vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loading-text {
-  font-size: 24px;
-  animation: loadingAnimation 1.5s infinite;
-}
-
-@keyframes loadingAnimation {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 #news {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
   margin: 20px auto;
-}
-
-.news-item {
-  width: 40vw;
-  height: 60vh;
-  margin: 20px 0;
-  text-align: center;
-  overflow-x: hidden;
-  padding-top: 10px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  transition:
-    transform 0.3s,
-    box-shadow 0.3s;
-}
-
-.news-item.mobile {
-  width: 80vw;
-}
-
-.news-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.news-info {
-  display: flex;
-  justify-content: space-around;
-  flex-flow: wrap;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.publish-time {
-  background-color: #e0f7fa;
-  color: #00796b;
-}
-.publish-time.mobile {
-  width: 98%;
-  margin: 5px 2%;
-  flex-grow: 1;
-}
-.read-count {
-  background-color: #fff3e0;
-  color: #e65100;
-}
-.read-count.mobile {
-  width: 40%;
-  margin: 5px 2%;
-}
-
-.like-count {
-  background-color: #fce4ec;
-  color: #d81b60;
-}
-.like-count.mobile {
-  width: 40%;
-  margin: 5px 2%;
-}
-
-.news-info p {
-  margin: 5px 0;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background-color: #f5f5f5;
-  /* color: #333; */
-  font-size: 14px;
-}
-
-.news-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  margin: 0;
-  padding: 0;
 }
 
 #input {
@@ -441,6 +319,70 @@ watch(newList, () => {
   text-size-adjust: 100%;
   touch-action: manipulation;
 }
+#info {
+  text-size-adjust: 100%;
+  font-family: var(--vt-font-family-base);
+  color: var(--vt-c-text-1);
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  text-rendering: unset !important;
+  font-synthesis: unset !important;
+  text-align: center;
+  box-sizing: border-box;
+  line-height: 1.25;
+  font-weight: 900;
+  max-width: 960px;
+  margin: 0px auto;
+  font-size: 64px;
+  letter-spacing: -0.5px;
+}
+
+.switch-focus {
+  z-index: 9999;
+  position: fixed;
+  top: 40px;
+  right: -100px;
+  transform: translateY(-50%);
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: right 0.3s;
+}
+
+.switch-focus:hover {
+  right: 0px;
+}
+</style>
+<style>
+.loading-container {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-text {
+  font-size: 24px;
+  animation: loadingAnimation 1.5s infinite;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .explorer {
   background-attachment: scroll, scroll;
   background-clip: padding-box, border-box;
@@ -519,23 +461,5 @@ watch(newList, () => {
   transition-timing-function: ease, ease;
   -webkit-font-smoothing: antialiased;
   -webkit-border-image: none;
-}
-#info {
-  text-size-adjust: 100%;
-  font-family: var(--vt-font-family-base);
-  color: var(--vt-c-text-1);
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-  overflow-wrap: break-word;
-  text-rendering: unset !important;
-  font-synthesis: unset !important;
-  text-align: center;
-  box-sizing: border-box;
-  line-height: 1.25;
-  font-weight: 900;
-  max-width: 960px;
-  margin: 0px auto;
-  font-size: 64px;
-  letter-spacing: -0.5px;
 }
 </style>
