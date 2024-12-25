@@ -28,6 +28,7 @@
         </div>
         <iframe
           v-if="index <= loadedIndex && index < maxLoadedIndex"
+          scrolling="no"
           class="news-iframe"
           :class="{ mobile: isMobile }"
           :src="news.url"
