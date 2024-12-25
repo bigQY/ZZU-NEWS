@@ -9,7 +9,8 @@
     "preview": "pnpm run build && wrangler pages dev",
     "postinstall": "nuxt prepare",
     "deploy": "pnpm run build && wrangler pages deploy",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
     "nuxt": "^3.14.1592",
@@ -19,8 +20,13 @@
   "packageManager": "pnpm@9.15.1+sha1.abc117858086cb10ecb54828d180b035cb6c8fdd",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
+    "@rushstack/eslint-patch": "^1.10.4",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
     "h3": "^1.13.0",
     "nitro-cloudflare-dev": "^0.2.1",
+    "prettier": "^3.2.5",
     "wrangler": "^3.99.0"
   }
 }

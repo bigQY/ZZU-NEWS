@@ -26,3 +26,7 @@ logs
 # wrangler files
 .wrangler
 .dev.vars
+
+.vscode
+
+pnpm-lock.yaml
