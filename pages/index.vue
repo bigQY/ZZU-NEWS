@@ -51,6 +51,11 @@
           <a class="explorer" @click="likeNews(news.url)">点赞</a>
         </div>
       </div>
+      <div style="width: 100%; text-align: center" v-if="newList.length === 0">
+        <div class="loading-container">
+          <div class="loading-text">加载中...</div>
+        </div>
+      </div>
     </div>
     <div style="width: 100%; text-align: center">
       <a class="explorer" @click="loadMoreNews(0, 10)">查看更多</a>
