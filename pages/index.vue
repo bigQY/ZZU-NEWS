@@ -68,37 +68,63 @@ const switchFocusMode = () => {
   })
 }
 
-const handleKeydown = (event) => {
+const handleKeydown = async (event) => {
   if (focusMode.value) {
     if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-      if (focusIndex.value > 0) {
-        focusIndex.value--
-      }
+      onPageUp()
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-      if (focusIndex.value < newList.value.length - 1) {
-        focusIndex.value++
-      }
+      await onPageDown()
     }
   }
 }
 
-const onPageChange = (action) => {
+const onPageChange = async (action) => {
   if (action === 'pre') {
-    if (focusIndex.value > 0) {
-      focusIndex.value--
-    } else {
-      alert('已经是第一篇了')
-    }
+    onPageUp()
   } else if (action === 'next') {
-    if (focusIndex.value < newList.value.length - 1) {
-      focusIndex.value++
-    } else {
-      alert('已经是最后一篇了')
-    }
+    await onPageDown()
   } else {
     console.error('非法action')
   }
 }
+
+const onPageUp = () => {
+  if (focusIndex.value > 0) {
+    focusIndex.value--
+  } else {
+    alert('已经是第一篇了')
+  }
+}
+
+const onPageDown = async () => {
+  if (focusIndex.value < newList.value.length - 1) {
+    focusIndex.value++
+  } else {
+    if (currentPage.value < total.value / currentLimit.value - 1) {
+      await loadMoreNews()
+    } else {
+      alert('已经是最后一篇了')
+    }
+  }
+}
+
+const viewNews = async (url) => {
+  const viewedNews = JSON.parse(localStorage.getItem('viewedNews')) || []
+  if (!viewedNews.includes(url)) {
+    await $fetch('/api/viewNews', {
+      method: 'POST',
+      body: {
+        url
+      }
+    })
+  }
+  viewedNews.push(url)
+  localStorage.setItem('viewedNews', JSON.stringify(viewedNews))
+}
+
+watch(focusIndex, async () => {
+  await viewNews(newList.value[focusIndex.value].url)
+})
 
 const submitOpen = ref(false)
 
