@@ -30,12 +30,12 @@
           box-shadow: rgb(255 255 255 / 100%) 0px -20px 20px 20px;
         "
       >
-        <a class="explorer" @click="viewNews(news.url)">查看详情</a>
+        <a class="btn" @click="viewNews(news.url)">查看详情</a>
         <template v-if="isFocus">
-          <a class="explorer" @click="onPageChange('pre')">上一篇</a>
-          <a class="explorer" @click="onPageChange('next')">下一篇</a>
+          <a class="btn" @click="onPageChange('pre')">上一篇</a>
+          <a class="btn" @click="onPageChange('next')">下一篇</a>
         </template>
-        <a class="explorer" @click="likeNews(news.url)">点赞</a>
+        <a class="btn" @click="likeNews(news.url)">点赞</a>
       </div>
     </div>
   </div>

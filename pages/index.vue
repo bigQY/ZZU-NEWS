@@ -12,12 +12,12 @@
         <p id="info">一个<span style="color: red">自由</span>的新闻媒体</p>
         <div style="margin-top: 50px">
           <a id="publish" @click="publishNew">发布新闻</a>
-          <a class="explorer" href="#news">查看新闻</a>
+          <a class="btn" href="#news">查看新闻</a>
         </div>
       </div>
       <div id="submitNewNews" style="width: 100%; text-align: center" v-if="submitOpen">
         <input id="input" v-model="newNewsInput" type="text" placeholder="请输入新闻的IPFS地址" />
-        <a class="explorer" @click="submitNewNews">提交</a>
+        <a class="btn" @click="submitNewNews">提交</a>
       </div>
       <div id="news">
         <!-- 新闻显示 -->
@@ -49,7 +49,7 @@
       />
     </div>
     <div v-if="!focusMode" style="width: 100%; text-align: center">
-      <a class="explorer" @click="loadMoreNews(0, 10)">查看更多</a>
+      <a class="btn" @click="loadMoreNews(0, 10)">查看更多</a>
     </div>
   </div>
 </template>
@@ -261,162 +261,48 @@ watch(newList, () => {
     border-color 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
 }
-#head {
+
+#head,
+#title,
+#info {
   text-align: center;
-  padding: 10px;
-}
-#title {
-  text-size-adjust: 100%;
   font-family: var(--vt-font-family-base);
   color: var(--vt-c-text-1);
   direction: ltr;
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
+  text-rendering: unset !important;
+  font-synthesis: unset !important;
+  box-sizing: border-box;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+#title,
+#info {
+  font-size: 64px;
+  letter-spacing: -0.5px;
+}
+
+#title {
+  text-size-adjust: 100%;
   --vt-font-family-base: Quotes, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   text-rendering: unset !important;
   font-synthesis: unset !important;
-  text-align: center;
-  line-height: 1.25;
-  font-weight: 900;
-  font-size: 64px;
-  letter-spacing: -0.5px;
-  box-sizing: border-box;
   -webkit-text-fill-color: transparent;
   background: -webkit-linear-gradient(315deg, rgb(66, 211, 146) 25%, rgb(100, 126, 255)) text;
 }
-#publish {
-  background-color: rgb(66, 184, 131);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-sizing: border-box;
-  color: rgb(255, 255, 255);
-  cursor: pointer;
-  direction: ltr;
-  display: inline-block;
-  font-size: 16px;
-  font-synthesis-small-caps: auto;
-  font-synthesis-style: auto;
-  font-synthesis-weight: auto;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  line-height: 24px;
-  margin-right: 18px;
-  overflow-wrap: break-word;
-  padding-bottom: 8px;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 8px;
-  position: relative;
-  text-align: center;
-  text-decoration-color: rgb(255, 255, 255);
-  text-decoration-line: none;
-  text-decoration-style: solid;
-  text-decoration-thickness: auto;
-  text-rendering: auto;
-  text-size-adjust: 100%;
-  touch-action: manipulation;
-}
+
 #info {
-  text-size-adjust: 100%;
-  font-family: var(--vt-font-family-base);
-  color: var(--vt-c-text-1);
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-  overflow-wrap: break-word;
-  text-rendering: unset !important;
-  font-synthesis: unset !important;
-  text-align: center;
-  box-sizing: border-box;
-  line-height: 1.25;
-  font-weight: 900;
   max-width: 960px;
-  margin: 0px auto;
-  font-size: 64px;
-  letter-spacing: -0.5px;
+  margin: 0 auto;
 }
 
-.switch-focus {
-  z-index: 9999;
-  position: fixed;
-  top: 40px;
-  right: -100px;
-  transform: translateY(-50%);
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: right 0.3s;
-}
-
-.switch-focus:hover {
-  right: 0px;
-}
-</style>
-<style>
-.loading-container {
-  width: 100%;
-  height: 40vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loading-text {
-  font-size: 24px;
-  animation: loadingAnimation 1.5s infinite;
-}
-
-@keyframes loadingAnimation {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.explorer {
-  background-attachment: scroll, scroll;
-  background-clip: padding-box, border-box;
-  background-color: rgba(229, 229, 229, 0.082);
-  background-image: linear-gradient(rgb(229, 229, 229), rgb(229, 229, 229)),
-    linear-gradient(45deg, rgb(66, 211, 146), rgb(100, 126, 255));
-  background-origin: padding-box, border-box;
-  background-position-x: 0%, 0%;
-  background-position-y: 0%, 0%;
-  background-repeat: repeat, repeat;
-  background-size: auto, auto;
-  border-bottom-color: rgba(0, 0, 0, 0);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-bottom-style: solid;
-  border-bottom-width: 1.8018px;
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  border-left-color: rgba(0, 0, 0, 0);
-  border-left-style: solid;
-  border-left-width: 1.8018px;
-  border-right-color: rgba(0, 0, 0, 0);
-  border-right-style: solid;
-  border-right-width: 1.8018px;
-  border-top-color: rgba(0, 0, 0, 0);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-top-style: solid;
-  border-top-width: 1.8018px;
+#publish,
+.btn {
+  border-radius: 8px;
   box-sizing: border-box;
-  color: rgb(71, 101, 130);
   cursor: pointer;
   direction: ltr;
   display: inline-block;
@@ -438,28 +324,69 @@ watch(newList, () => {
     small-caps auto,
     style auto,
     weight auto;
-  font-weight: 500;
   letter-spacing: 0.2px;
   line-height: 24px;
   overflow-wrap: break-word;
-  padding-bottom: 8px;
-  padding-left: 18px;
-  padding-right: 18px;
-  padding-top: 8px;
+  padding: 8px 16px;
   text-align: center;
-  text-decoration-color: rgb(71, 101, 130);
-  text-decoration-line: none;
-  text-decoration-style: solid;
-  text-decoration-thickness: auto;
+  text-decoration: none;
   text-rendering: auto;
   text-size-adjust: 100%;
   touch-action: manipulation;
-  transition-behavior: normal, normal;
-  transition-delay: 0s, 0s;
-  transition-duration: 0.2s;
-  transition-property: background-color, color;
-  transition-timing-function: ease, ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   -webkit-font-smoothing: antialiased;
-  -webkit-border-image: none;
+}
+
+#publish {
+  background-color: rgb(66, 184, 131);
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  margin-right: 18px;
+  text-decoration-color: rgb(255, 255, 255);
+}
+
+.switch-focus {
+  z-index: 9999;
+  position: fixed;
+  top: 40px;
+  right: -100px;
+  transform: translateY(-50%);
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  transition: right 0.3s;
+}
+
+.switch-focus:hover {
+  right: 0;
+}
+</style>
+
+<style>
+.loading-container {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-text {
+  font-size: 24px;
+  animation: loadingAnimation 1.5s infinite;
+}
+
+@keyframes loadingAnimation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>
