@@ -3,7 +3,7 @@ const CACHE_NAME = 'CACHE_NAME_PLACEHOLDER'
 // 安装 Service Worker
 self.addEventListener('install', (event) => {
   console.log('Service Worker installing.')
-  self.skipWaiting()
+  self.skipWaiting() // 强制等待中的 Service Worker 成为激活状态
 })
 
 // 激活 Service Worker 并清理旧缓存
@@ -21,7 +21,7 @@ self.addEventListener('activate', (event) => {
       )
     })
   )
-  return self.clients.claim()
+  self.clients.claim() // 立即接管所有页面
 })
 
 // 拦截请求并缓存资源
@@ -41,21 +41,25 @@ self.addEventListener('fetch', (event) => {
         if (cachedResponse) {
           return cachedResponse
         }
-        return fetch(event.request).then((response) => {
-          const clonedResponse = response.clone()
-          const contentType = response.headers.get('Content-Type')
-          if (
-            event.request.url.endsWith('.js') ||
-            event.request.url.endsWith('.css') ||
-            event.request.url.match(/\.(png|jpg|jpeg|gif|ico)$/) ||
-            (contentType && contentType.includes('text/html'))
-          ) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, clonedResponse)
-            })
-          }
-          return response
-        })
+        return fetch(event.request)
+          .then((response) => {
+            const clonedResponse = response.clone()
+            const contentType = response.headers.get('Content-Type')
+            if (
+              event.request.url.endsWith('.js') ||
+              event.request.url.endsWith('.css') ||
+              event.request.url.match(/\.(png|jpg|jpeg|gif|ico)$/) ||
+              (contentType && contentType.includes('text/html'))
+            ) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, clonedResponse)
+              })
+            }
+            return response
+          })
+          .catch((error) => {
+            console.error('Fetch failed; returning offline page instead.', error)
+          })
       })
     )
   }
