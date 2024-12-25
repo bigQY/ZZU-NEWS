@@ -7,9 +7,9 @@
       </button>
     </div>
     <div v-show="!focusMode">
-      <div id="head">
+      <div id="head" class="animated-title">
         <h1 id="title">郑州大学大新闻</h1>
-        <p id="info">一个<span style="color: red">自由</span>的新闻媒体</p>
+        <p id="info">一个<span class="animated-word" style="color: red">自由</span>的新闻媒体</p>
         <div style="margin-top: 50px">
           <a id="publish" @click="publishNew">发布新闻</a>
           <a class="btn" href="#news">查看新闻</a>

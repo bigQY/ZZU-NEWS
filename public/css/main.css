@@ -67,3 +67,34 @@
     opacity: 0.5;
   }
 }
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes colorChange {
+  0% {
+    color: red;
+  }
+  50% {
+    color: lightcoral;
+  }
+  100% {
+    color: red;
+  }
+}
+
+.animated-title {
+  animation: fadeIn 1s ease-in-out;
+}
+
+.animated-word {
+  animation: colorChange 3s infinite;
+}
