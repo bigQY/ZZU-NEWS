@@ -14,6 +14,7 @@
         class="news-iframe"
         :class="{ mobile: isMobile }"
         :src="news.url"
+        loading="lazy"
         @load="onIframeLoadWrapper($event)"
         @error="onIframeError($event)"
         :style="{ height: iframeHeight + 'px' }"
