@@ -1,4 +1,5 @@
 .btn {
+  -webkit-user-select: none;
   font-weight: 900;
   background-color: rgba(229, 229, 229, 0.082);
   background-image: linear-gradient(rgb(229, 229, 229), rgb(229, 229, 229)),

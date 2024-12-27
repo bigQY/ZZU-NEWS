@@ -25,10 +25,10 @@
           v-for="(news, index) in newList"
           :key="news.id"
           :news="news"
-          :isLoading="index <= loadedIndex && index < maxLoadedIndex"
           :isMobile="isMobile"
           :iframeHeight="iframeHeight"
           :onIframeLoad="onIframeLoad"
+          :onIframeError="onIframeError"
         />
         <div style="width: 100%; text-align: center" v-if="newList.length === 0">
           <div class="loading-container">
@@ -130,7 +130,7 @@ const submitOpen = ref(false)
 
 const publishNew = () => {
   const publishUrl =
-    'https://ipfs.zzu.news/ipfs/QmeU8dV5rKG4y47MKo7og5wkcp2K6FdSodNefiowfRSH1R/#ipfs.zzu.news'
+    'https://ipfs.zzu.news/ipfs/QmNyiNESEsTVtw5jjwkzZ1nH1auczwgfyFq2LgbAFV9vjM/#ipfs.zzu.news'
 
   // 创建一个新的窗口
   const newWindow = window.open(publishUrl, '_blank')
@@ -161,7 +161,7 @@ const submitNewNews = async () => {
   }
   if (
     newNewsInput.value ===
-    'https://ipfs.zzu.news/ipfs/QmeU8dV5rKG4y47MKo7og5wkcp2K6FdSodNefiowfRSH1R/#ipfs.zzu.news'
+    'https://ipfs.zzu.news/ipfs/QmNyiNESEsTVtw5jjwkzZ1nH1auczwgfyFq2LgbAFV9vjM/#ipfs.zzu.news'
   ) {
     alert('请输入正确的IPFS地址, 不能是发布新闻的地址')
     return
@@ -185,6 +185,14 @@ const onIframeLoad = (event) => {
     maxLoadedIndex.value++
   }
 }
+const onIframeError = (event) => {
+  console.error('iframe加载失败', event)
+  loadedIndex.value++
+  if (loadedIndex.value < newList.value.length) {
+    maxLoadedIndex.value++
+  }
+}
+
 onMounted(() => {
   // 初始化加载第一个 iframe
   loadNews()

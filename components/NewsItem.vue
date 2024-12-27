@@ -9,15 +9,16 @@
         <p :class="['like-count', { mobile: isMobile }]">点赞量 {{ news.like_count }}</p>
       </div>
       <iframe
-        v-if="isLoading"
+        v-show="!isLoading"
         :scrolling="iframeScrolling"
         class="news-iframe"
         :class="{ mobile: isMobile }"
         :src="news.url"
-        @load="onIframeLoad($event)"
+        @load="onIframeLoadWrapper($event)"
+        @error="onIframeError($event)"
         :style="{ height: iframeHeight + 'px' }"
       ></iframe>
-      <div v-else class="loading-container">
+      <div v-show="isLoading" class="loading-container">
         <div class="loading-text">加载中...</div>
       </div>
       <br />
@@ -42,26 +43,39 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+
+const isLoading = ref(true)
 
 const props = defineProps({
   news: Object,
   isMobile: Boolean,
-  isLoading: {
-    type: Boolean,
-    default: true
-  },
   isFocus: {
     type: Boolean,
     default: false
   },
   iframeHeight: Number,
   onIframeLoad: Function,
+  onIframeError: Function,
   onPageChange: Function,
   iframeScrolling: {
     type: String,
     default: 'no'
   }
+})
+
+const onIframeLoadWrapper = (event) => {
+  clearTimeout(errorTimer.value)
+  isLoading.value = false
+  props.onIframeLoad(event)
+}
+
+const errorTimer = ref(null)
+
+onMounted(() => {
+  errorTimer.value = setTimeout(() => {
+    props.onIframeError()
+  }, 5000)
 })
 
 const viewNews = async (url) => {
