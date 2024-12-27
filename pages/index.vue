@@ -28,7 +28,6 @@
           :isMobile="isMobile"
           :iframeHeight="iframeHeight"
           :onIframeLoad="onIframeLoad"
-          :onIframeError="onIframeError"
         />
         <div style="width: 100%; text-align: center" v-if="newList.length === 0">
           <div class="loading-container">
@@ -42,7 +41,6 @@
         :news="newList[focusIndex]"
         :isMobile="isMobile"
         :iframeHeight="iframeHeight"
-        :onIframeLoad="onFocusIframeLoad"
         :onPageChange="onPageChange"
         iframeScrolling="yes"
         :isFocus="true"
@@ -172,7 +170,6 @@ const submitNewNews = async () => {
       url: newNewsInput.value
     }
   })
-  console.log(result)
   submitOpen.value = false
 }
 

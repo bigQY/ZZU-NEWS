@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'focus-mode': isFocus }">
+  <div ref="loadProbe" :class="{ 'focus-mode': isFocus }">
     <div :class="['news-item', { mobile: isMobile }]">
       <div class="news-info">
         <p :class="['publish-time', { mobile: isMobile }]">
@@ -8,18 +8,18 @@
         <p :class="['read-count', { mobile: isMobile }]">浏览量 {{ news.read_count }}</p>
         <p :class="['like-count', { mobile: isMobile }]">点赞量 {{ news.like_count }}</p>
       </div>
-      <iframe
-        v-show="!isLoading"
-        :scrolling="iframeScrolling"
-        class="news-iframe"
-        :class="{ mobile: isMobile }"
-        :src="news.url"
-        loading="lazy"
-        @load="onIframeLoadWrapper($event)"
-        @error="onIframeError($event)"
-        :style="{ height: iframeHeight + 'px' }"
-      ></iframe>
-      <div v-show="isLoading" class="loading-container">
+      <div v-if="isShowIframe">
+        <iframe
+          v-show="!isLoading"
+          :scrolling="iframeScrolling"
+          class="news-iframe"
+          :class="{ mobile: isMobile }"
+          :src="news.url"
+          @load="onIframeLoadWrapper($event)"
+          :style="{ height: iframeHeight + 'px' }"
+        ></iframe>
+      </div>
+      <div v-show="!isShowIframe || isLoading" class="loading-container">
         <div class="loading-text">加载中...</div>
       </div>
       <br />
@@ -44,9 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-
-const isLoading = ref(true)
+import { ref, onBeforeUnmount, onMounted } from 'vue'
 
 const props = defineProps({
   news: Object,
@@ -56,8 +54,10 @@ const props = defineProps({
     default: false
   },
   iframeHeight: Number,
-  onIframeLoad: Function,
-  onIframeError: Function,
+  onIframeLoad: {
+    type: Function,
+    default: () => {}
+  },
   onPageChange: Function,
   iframeScrolling: {
     type: String,
@@ -65,19 +65,48 @@ const props = defineProps({
   }
 })
 
+const isLoading = ref(true)
+const isShowIframe = ref(false)
+
+// 组件是否在视口中
+const loadProbe = ref(null)
+
+const viewChangeDelay = 1000
+let viewChangeTimer = null
+const handleIntersection = (entries) => {
+  entries.forEach((entry) => {
+    if (viewChangeTimer) {
+      clearTimeout(viewChangeTimer)
+      viewChangeTimer = null
+    }
+    if (entry.isIntersecting) {
+      viewChangeTimer = setTimeout(() => {
+        isShowIframe.value = true
+      }, viewChangeDelay)
+    } else {
+      viewChangeTimer = setTimeout(() => {
+        isShowIframe.value = false
+      }, viewChangeDelay)
+    }
+  })
+}
+let observer
+onMounted(() => {
+  if (import.meta.client) {
+    observer = new IntersectionObserver(handleIntersection)
+    observer.observe(loadProbe.value)
+  }
+})
+onBeforeUnmount(() => {
+  if (import.meta.client && observer) {
+    observer.unobserve(loadProbe.value)
+  }
+})
+
 const onIframeLoadWrapper = (event) => {
-  clearTimeout(errorTimer.value)
   isLoading.value = false
   props.onIframeLoad(event)
 }
-
-const errorTimer = ref(null)
-
-onMounted(() => {
-  errorTimer.value = setTimeout(() => {
-    props.onIframeError()
-  }, 5000)
-})
 
 const viewNews = async (url) => {
   const viewedNews = JSON.parse(localStorage.getItem('viewedNews')) || []

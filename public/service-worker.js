@@ -26,8 +26,6 @@ self.addEventListener('activate', (event) => {
 
 // 拦截请求并缓存资源
 self.addEventListener('fetch', (event) => {
-  console.log('Fetching:', event.request.url)
-
   // 排除 POST 请求、带有 'api' 的请求和带参数的 GET 请求
   if (
     event.request.method !== 'POST' &&

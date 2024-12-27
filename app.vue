@@ -5,7 +5,7 @@
   </div>
 </template>
 <script setup>
-if (process.client && 'serviceWorker' in navigator) {
+if (import.meta.client && import.meta.env.MODE !== 'development' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/service-worker.js', { updateViaCache: 'none' })
     .then((registration) => {})
