@@ -49,14 +49,14 @@
       />
     </div>
     <div v-if="!focusMode" style="width: 100%; text-align: center">
-      <a class="btn" @click="loadMoreNews(0, 10)">查看更多</a>
+      <a ref="loadMoreTrigger" class="btn" @click="loadMoreNews(0, 10)">查看更多</a>
     </div>
   </div>
 </template>
 
 <script setup>
 import NewsItem from '@/components/NewsItem.vue'
-import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watchEffect, nextTick, watch } from 'vue'
 
 const focusMode = ref(false)
 const focusIndex = ref(0)
@@ -216,14 +216,61 @@ const loadNews = async () => {
   total.value = result.total.results[0]['COUNT(*)']
 }
 
+const loadMoreTrigger = ref(null)
+
 const loadMoreNews = async () => {
   currentPage.value++
   if (currentPage.value * currentLimit.value >= total.value) {
-    alert('没有更多新闻了')
+    if (newList.value.length === 0) {
+      console.log('页面刚刚初始化，新闻未加载')
+    } else {
+      alert('没有更多新闻了')
+      observer.unobserve(loadMoreTrigger.value)
+    }
     return
   }
-  await loadNews()
+  try {
+    await loadNews()
+  } catch (error) {
+    console.error('加载新闻失败:', error)
+  }
 }
+let observer
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+  window.addEventListener('resize', computeIframeHeight)
+  window.addEventListener('keydown', handleKeydown)
+
+  if (process.client) {
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          loadMoreNews()
+        }
+      })
+    })
+    if (observer && loadMoreTrigger.value) {
+      observer.observe(loadMoreTrigger.value)
+    }
+  }
+})
+
+watchEffect(loadMoreTrigger, () => {
+  if (observer && loadMoreTrigger.value) {
+    observer.observe(loadMoreTrigger.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkMobile)
+  window.removeEventListener('resize', computeIframeHeight)
+  window.removeEventListener('keydown', handleKeydown)
+
+  if (observer && loadMoreTrigger.value) {
+    observer.unobserve(loadMoreTrigger.value)
+  }
+})
 
 const isMobile = ref(false)
 const checkMobile = () => {
