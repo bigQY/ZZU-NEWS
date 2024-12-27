@@ -19,7 +19,11 @@
           :style="{ height: iframeHeight + 'px' }"
         ></iframe>
       </div>
-      <div v-show="!isShowIframe || isLoading" class="loading-container">
+      <div
+        v-show="!isShowIframe || isLoading"
+        class="loading-container"
+        :style="{ height: iframeHeight + 'px' }"
+      >
         <div class="loading-text">加载中...</div>
       </div>
       <br />

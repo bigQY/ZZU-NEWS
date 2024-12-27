@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .btn {
   -webkit-user-select: none;
   font-weight: 900;

@@ -14,6 +14,7 @@
     "update-sw-cache": "node update-sw-cache.js"
   },
   "dependencies": {
+    "lodash-es": "^4.17.21",
     "nuxt": "^3.14.1592",
     "vue": "latest",
     "vue-router": "latest"

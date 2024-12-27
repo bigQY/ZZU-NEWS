@@ -28,6 +28,7 @@
           :isMobile="isMobile"
           :iframeHeight="iframeHeight"
           :onIframeLoad="onIframeLoad"
+          style="overflow-y: hidden"
         />
         <div style="width: 100%; text-align: center" v-if="newList.length === 0">
           <div class="loading-container">
@@ -55,6 +56,7 @@
 <script setup>
 import NewsItem from '@/components/NewsItem.vue'
 import { ref, onMounted, onBeforeUnmount, watchEffect, nextTick, watch } from 'vue'
+import { debounce } from 'lodash-es'
 
 const focusMode = ref(false)
 const focusIndex = ref(0)
@@ -240,13 +242,18 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
 
   if (process.client) {
-    observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          loadMoreNews()
-        }
-      })
-    })
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadMoreNews()
+          }
+        })
+      },
+      {
+        rootMargin: '0px 0px 10000px 0px'
+      }
+    )
     if (observer && loadMoreTrigger.value) {
       observer.observe(loadMoreTrigger.value)
     }
@@ -315,6 +322,50 @@ watch(newList, () => {
   nextTick(() => {
     computeIframeHeight()
   })
+})
+
+// 统计最近的滚动速度，预测接下来5秒会不会滚动到底部
+const scrollProbe = ref({
+  lastScrollY: 0,
+  lastScrollTime: Date.now(),
+  isScrollingToBottom: false
+})
+
+const isAlreadyLoading = ref(false)
+
+const handleScroll = () => {
+  const { lastScrollY, lastScrollTime } = scrollProbe.value
+  const currentScrollY = window.scrollY
+  const currentScrollTime = Date.now()
+  const scrollDistance = currentScrollY - lastScrollY
+  const scrollTime = currentScrollTime - lastScrollTime
+  const scrollSpeed = scrollDistance / scrollTime
+  const predictedScrollY = currentScrollY + scrollSpeed * 1000 // 预测5秒后的滚动位置
+  const isScrollingToBottom =
+    predictedScrollY >= document.documentElement.scrollHeight - window.innerHeight
+  scrollProbe.value = {
+    lastScrollY: currentScrollY,
+    lastScrollTime: currentScrollTime,
+    isScrollingToBottom
+  }
+}
+
+watch(scrollProbe, (newVal) => {
+  if (newVal.isScrollingToBottom && !isAlreadyLoading.value) {
+    console.log('即将滚动到底部，加载更多新闻')
+    isAlreadyLoading.value = true
+    loadMoreNews().then(() => {
+      isAlreadyLoading.value = false
+    })
+  }
+})
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 

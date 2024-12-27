@@ -22,7 +22,9 @@ if (import.meta.client && import.meta.env.MODE !== 'development' && 'serviceWork
         }
       }
     })
-    .catch((error) => {})
+    .catch((error) => {
+      console.error('Error during service worker registration:', error)
+    })
 }
 </script>
 <style>
