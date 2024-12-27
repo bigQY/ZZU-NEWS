@@ -48,7 +48,7 @@
       />
     </div>
     <div v-if="!focusMode" style="width: 100%; text-align: center">
-      <a ref="loadMoreTrigger" class="btn" @click="loadMoreNews(0, 10)">查看更多</a>
+      <a ref="loadMoreTrigger" class="btn" @click="loadMoreNews()">查看更多</a>
     </div>
   </div>
 </template>
@@ -217,6 +217,7 @@ const loadNews = async () => {
 
 const loadMoreTrigger = ref(null)
 
+const isAlreadyLoading = ref(false)
 const loadMoreNews = async () => {
   currentPage.value++
   if (currentPage.value * currentLimit.value >= total.value) {
@@ -229,8 +230,15 @@ const loadMoreNews = async () => {
     return
   }
   try {
-    await loadNews()
+    if (isAlreadyLoading.value) {
+      return
+    }
+    isAlreadyLoading.value = true
+    loadNews().then(() => {
+      isAlreadyLoading.value = false
+    })
   } catch (error) {
+    isAlreadyLoading.value = false
     console.error('加载新闻失败:', error)
   }
 }
@@ -331,8 +339,6 @@ const scrollProbe = ref({
   isScrollingToBottom: false
 })
 
-const isAlreadyLoading = ref(false)
-
 const handleScroll = () => {
   const { lastScrollY, lastScrollTime } = scrollProbe.value
   const currentScrollY = window.scrollY
@@ -353,10 +359,7 @@ const handleScroll = () => {
 watch(scrollProbe, (newVal) => {
   if (newVal.isScrollingToBottom && !isAlreadyLoading.value) {
     console.log('即将滚动到底部，加载更多新闻')
-    isAlreadyLoading.value = true
-    loadMoreNews().then(() => {
-      isAlreadyLoading.value = false
-    })
+    loadMoreNews()
   }
 })
 
