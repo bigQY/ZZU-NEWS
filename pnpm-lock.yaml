@@ -5,12 +5,18 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@unhead/ssr':
+    specifier: ^1.11.14
+    version: 1.11.14
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
   nuxt:
     specifier: ^3.14.1592
     version: 3.14.1592(eslint@8.57.1)(typescript@5.7.2)(vite@5.4.11)
+  unhead:
+    specifier: ^1.11.14
+    version: 1.11.14
   vue:
     specifier: latest
     version: 3.5.13(typescript@5.7.2)

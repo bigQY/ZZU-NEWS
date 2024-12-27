@@ -8,5 +8,11 @@ export default defineNuxtConfig({
     preset: 'cloudflare-pages'
   },
 
-  modules: ['nitro-cloudflare-dev']
+  modules: ['nitro-cloudflare-dev'],
+
+  routeRules: {
+    '/': { prerender: true, ssr: true }
+  },
+
+  app: { pageTransition: { name: 'page', mode: 'out-in' } }
 })

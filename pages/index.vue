@@ -219,6 +219,9 @@ const loadMoreTrigger = ref(null)
 
 const isAlreadyLoading = ref(false)
 const loadMoreNews = async () => {
+  if (isAlreadyLoading.value) {
+    return
+  }
   currentPage.value++
   if (currentPage.value * currentLimit.value >= total.value) {
     if (newList.value.length === 0) {
@@ -230,9 +233,6 @@ const loadMoreNews = async () => {
     return
   }
   try {
-    if (isAlreadyLoading.value) {
-      return
-    }
     isAlreadyLoading.value = true
     loadNews().then(() => {
       isAlreadyLoading.value = false

@@ -36,7 +36,7 @@
           box-shadow: rgb(255 255 255 / 100%) 0px -20px 20px 20px;
         "
       >
-        <a class="btn" @click="viewNews(news.url)">查看详情</a>
+        <a class="btn" :href="news.url" @click.prevent="viewNews(news.url)">查看详情</a>
         <template v-if="isFocus">
           <a class="btn" @click="onPageChange('pre')">上一篇</a>
           <a class="btn" @click="onPageChange('next')">下一篇</a>
@@ -75,7 +75,7 @@ const isShowIframe = ref(false)
 // 组件是否在视口中
 const loadProbe = ref(null)
 
-const viewChangeDelay = 1000
+const viewChangeDelay = 100
 let viewChangeTimer = null
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {

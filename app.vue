@@ -4,7 +4,22 @@
     <NuxtPage />
   </div>
 </template>
+
 <script setup>
+import { useSeoMeta } from 'unhead'
+
+useSeoMeta({
+  title: '郑州大学大新闻',
+  ogTitle: '郑州大学大新闻',
+  description: '郑州大学大新闻是一个自由的新闻媒体平台，提供最新的新闻和资讯。',
+  ogDescription: '郑州大学大新闻是一个自由的新闻媒体平台，提供最新的新闻和资讯。',
+  ogImage: 'https://www.zzu.edu.cn/images/dhbanner/zsjy.jpg',
+  ogType: 'website',
+  ogUrl: 'https://zzu.news',
+  ogSiteName: '郑州大学大新闻',
+  keywords: '郑州大学, 新闻, 自媒体, 最新新闻, 资讯'
+})
+
 if (import.meta.client && import.meta.env.MODE !== 'development' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/service-worker.js', { updateViaCache: 'none' })
