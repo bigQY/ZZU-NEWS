@@ -201,7 +201,7 @@ onMounted(() => {
   }
 })
 const currentPage = ref(0)
-const currentLimit = ref(10)
+const currentLimit = ref(100)
 const total = ref(1)
 
 const loadNews = async () => {
