@@ -8,6 +8,9 @@ dependencies:
   '@unhead/ssr':
     specifier: ^1.11.14
     version: 1.11.14
+  '@unhead/vue':
+    specifier: ^1.11.14
+    version: 1.11.14(vue@3.5.13)
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21

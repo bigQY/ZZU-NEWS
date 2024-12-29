@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@unhead/ssr": "^1.11.14",
+    "@unhead/vue": "^1.11.14",
     "lodash-es": "^4.17.21",
     "nuxt": "^3.14.1592",
     "unhead": "^1.11.14",
