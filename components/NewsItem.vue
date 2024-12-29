@@ -156,6 +156,7 @@ const likeNews = async (url) => {
   width: 40vw;
   height: 60vh;
   margin: 20px 0;
+  padding: 10px;
   text-align: center;
   overflow-x: hidden;
   padding-top: 10px;

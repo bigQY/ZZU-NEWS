@@ -28,7 +28,6 @@
           :isMobile="isMobile"
           :iframeHeight="iframeHeight"
           :onIframeLoad="onIframeLoad"
-          style="overflow-y: hidden"
         />
         <div style="width: 100%; text-align: center" v-if="newList.length === 0">
           <div class="loading-container">
