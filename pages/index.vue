@@ -210,6 +210,23 @@ const loadNews = async () => {
       limit: currentLimit.value
     }
   })
+  // 修改url绕过浏览器连接数限制
+  const serverCount = 5
+  result.result.results.forEach((news, index) => {
+    // 计算新闻的index
+    const currentLength = newList.value.length
+    let serverIndex = currentLength + index
+    serverIndex = total.value - serverIndex - 1
+    if (serverIndex < 0) {
+      serverIndex = -serverIndex
+    }
+    serverIndex = serverIndex % serverCount
+    news.url = news.url.replace(
+      'https://ipfs.zzu.news/ipfs/',
+      `https://${serverIndex}-ipfs.zzu.news/ipfs/`
+    )
+  })
+
   newList.value = [...newList.value, ...result.result.results]
   total.value = result.total.results[0]['COUNT(*)']
 }
