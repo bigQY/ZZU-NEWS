@@ -1,75 +1,47 @@
-# Nuxt Minimal Starter
+# ZZU News
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+这是一个基于 Nuxt.js 的新闻项目，使用了IPFS作为数据存储，Cloudflare Workers作为服务器。
 
-## Setup
+# demo
 
-Make sure to install dependencies:
+[https://zzu-news.pages.dev/](https://zzu-news.pages.dev/)
+
+## 项目亮点
+
+项目集成了去中心化存储和无服务器架构，提供了高效、可靠的新闻发布和展示平台。
+
+## 安装依赖
+
+请确保安装依赖：
 
 ```bash
-# npm
-npm install
-
 # pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+## 开发服务器
 
-Start the development server on `http://localhost:3000`:
+在 `http://localhost:3000` 启动开发服务器：
 
 ```bash
-# npm
-npm run dev
-
 # pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+## 生产环境
 
-Build the application for production:
+构建生产环境应用：
 
 ```bash
-# npm
-npm run build
-
 # pnpm
 pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+本地预览生产环境构建：
 
 ```bash
-# npm
-npm run preview
-
 # pnpm
 pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+更多信息请查看 [Nuxt 文档](https://nuxt.com/docs/getting-started/introduction) 和 [部署文档](https://nuxt.com/docs/getting-started/deployment)。
